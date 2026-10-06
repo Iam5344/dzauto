@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication66.Models;
 
 namespace WebApplication66.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
         private static readonly List<Product> Products = new List<Product>
@@ -15,12 +16,15 @@ namespace WebApplication66.Controllers
         };
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<Product>), StatusCodes.Status200OK)]
         public IActionResult GetProducts()
         {
             return Ok(Products);
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult GetProductById(int id)
         {
             var product = Products.FirstOrDefault(p => p.Id == id);
@@ -33,6 +37,8 @@ namespace WebApplication66.Controllers
         }
 
         [HttpGet("search")]
+        [ProducesResponseType(typeof(IEnumerable<Product>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public IActionResult SearchProducts([FromQuery] string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -48,6 +54,8 @@ namespace WebApplication66.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public IActionResult CreateProduct([FromBody] ProductDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
@@ -70,6 +78,9 @@ namespace WebApplication66.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult UpdateProduct(int id, [FromBody] ProductDto dto)
         {
             var existingProduct = Products.FirstOrDefault(p => p.Id == id);
@@ -90,6 +101,8 @@ namespace WebApplication66.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public IActionResult DeleteProduct(int id)
         {
             var product = Products.FirstOrDefault(p => p.Id == id);
