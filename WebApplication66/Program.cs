@@ -1,31 +1,15 @@
-using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using ProjectTracker.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "WebApplication66 API",
-        Version = "v1",
-        Description = "Авто-документація RESTful Web API для сутностей Product, Order та OrderItem."
-    });
-});
-
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApplication66 API v1");
-    });
-}
 
-app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
